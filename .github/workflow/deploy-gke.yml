@@ -1,69 +1,56 @@
-name: Deploy Backstage to GKE
+name: Deploy Backstage to Cloud Run
 
 on:
-  push:
-    branches:
-      - main
+push:
+branches:
+- main
 
 env:
-  PROJECT_ID: backstage-test-499007
-  CLUSTER_NAME: backstage-cluster
-  CLUSTER_LOCATION: asia-south1-a
-  REPOSITORY: backstage
-  IMAGE_NAME: backstage-angular
+PROJECT_ID: backstage-test-499007
+REGION: asia-south1
+REPOSITORY: backstage
+IMAGE_NAME: backstage
+SERVICE_NAME: backstage
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+deploy:
+runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      id-token: write
+```
+permissions:
+  contents: read
+  id-token: write
 
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+steps:
+  - name: Checkout Code
+    uses: actions/checkout@v4
 
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+  - name: Authenticate to GCP
+    uses: google-github-actions/auth@v2
+    with:
+      credentials_json: '${{ secrets.GCP_SA_KEY }}'
 
-      - name: Setup GCloud
-        uses: google-github-actions/setup-gcloud@v2
+  - name: Setup GCloud
+    uses: google-github-actions/setup-gcloud@v2
 
-      - name: Setup kubectl
-        uses: azure/setup-kubectl@v4
+  - name: Configure Docker
+    run: |
+      gcloud auth configure-docker asia-south1-docker.pkg.dev --quiet
 
-      - name: Configure Docker
-        run: |
-          gcloud auth configure-docker asia-south1-docker.pkg.dev --quiet
+  - name: Build Docker Image
+    run: |
+      docker build \
+        -t asia-south1-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:${{ github.sha }} .
 
-      - name: Get GKE Credentials
-        uses: google-github-actions/get-gke-credentials@v2
-        with:
-          cluster_name: ${{ env.CLUSTER_NAME }}
-          location: ${{ env.CLUSTER_LOCATION }}
+  - name: Push Docker Image
+    run: |
+      docker push asia-south1-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:${{ github.sha }}
 
-      - name: Build Docker Image
-        run: |
-          docker build \
-          -t asia-south1-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:${{ github.sha }} .
-
-      - name: Push Docker Image
-        run: |
-          docker push \
-          asia-south1-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:${{ github.sha }}
-
-      - name: Replace Image Tag
-        run: |
-          sed -i "s|IMAGE_PLACEHOLDER|asia-south1-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:${{ github.sha }}|g" k8s/deployment.yaml
-
-      - name: Deploy to Kubernetes
-        run: |
-          kubectl apply -f k8s/deployment.yaml
-          kubectl apply -f k8s/service.yaml
-
-      - name: Verify Deployment
-        run: |
-          kubectl rollout status deployment/angular-app
+  - name: Deploy to Cloud Run
+    run: |
+      gcloud run deploy $SERVICE_NAME \
+        --image asia-south1-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE_NAME:${{ github.sha }} \
+        --platform managed \
+        --region $REGION \
+        --allow-unauthenticated \
+        --port 7007
