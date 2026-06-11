@@ -9,8 +9,8 @@ env:
 PROJECT_ID: backstage-test-499007
 REGION: asia-south1
 REPOSITORY: backstage
-IMAGE_NAME: backstage
-SERVICE_NAME: backstage
+IMAGE_NAME: backstage-demo-sairam
+SERVICE_NAME: backstage-demo-sairam
 
 jobs:
 deploy:
