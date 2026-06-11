@@ -14,4 +14,4 @@ RUN yarn build:backend
 
 EXPOSE 7007
 
-CMD ["yarn", "start"]
+CMD ["node", "packages/backend", "--config", "app-config.yaml"]

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document explains the complete deployment flow from source code commit to deployment in Google Kubernetes Engine (GKE).
+This document explains the complete deployment flow from source code commit to deployment in Google Kubernetes Engine (GKE)
 
 ## Architecture
 

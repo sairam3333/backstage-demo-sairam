@@ -26,7 +26,7 @@ backend:
   #     - secret: ${BACKEND_SECRET}
   baseUrl: http://localhost:7007
   listen:
-    port: 7007
+    port: ${PORT}
     # Uncomment the following host directive to bind to specific interfaces
     # host: 127.0.0.1
   reading:
