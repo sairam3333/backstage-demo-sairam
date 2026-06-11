@@ -1,0 +1,12 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: backstatedemo
+  description: An example of a Backstage application
+  annotations:
+    backstage.io/techdocs-ref: dir: .
+spec:
+  type: website
+  owner: john@example.com
+  lifecycle: experimental
+  
