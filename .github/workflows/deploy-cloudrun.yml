@@ -43,8 +43,8 @@ jobs:
       - name: Build TypeScript
         run: yarn tsc
 
-      - name: Build Backend
-        run: yarn build:backend
+      - name: Build All
+        run: yarn build:all
 
       - name: Configure Docker
         run: gcloud auth configure-docker asia-south1-docker.pkg.dev --quiet
