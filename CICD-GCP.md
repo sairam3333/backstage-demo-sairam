@@ -7,7 +7,7 @@ This document explains the complete deployment flow from source code commit to d
 ## Architecture
 
 ```text
-Developer
+Developers
     |
     | Git Push
     v
