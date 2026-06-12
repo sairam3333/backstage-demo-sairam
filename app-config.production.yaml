@@ -39,7 +39,7 @@ backend:
 integrations:
   github:
     - host: github.com
-      token: ${GITHUB_TOKEN}
+      token: ${GIT_TOKEN}
 
 techdocs:
   builder: local

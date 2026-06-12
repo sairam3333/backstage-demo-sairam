@@ -36,12 +36,16 @@ jobs:
       - name: Compile TypeScript
         run: yarn tsc
 
+      - name: Build All Packages
+        run: yarn build:all
+
       - name: Build Backend Bundle
         run: yarn build:backend
 
-      - name: Verify Backend Bundle
+      - name: Verify Bundle Contents
         run: |
           ls -la packages/backend/dist
+          tar -tzf packages/backend/dist/bundle.tar.gz | head -100
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
