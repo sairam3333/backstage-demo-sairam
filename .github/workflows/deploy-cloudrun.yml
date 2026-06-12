@@ -39,7 +39,7 @@ jobs:
       - name: Build All Packages
         run: yarn build:all
 
-     # FIX: Use the standard package lifecycle build command
+      # FIX 1: Using the precise package build command for Backstage monorepos
       - name: Package Backend and Frontend Bundle
         run: yarn workspace backend backstage-cli package build
 
@@ -72,7 +72,7 @@ jobs:
           docker push \
             asia-south1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
-      # FIX: Explicitly passing the standard Cloud Run PORT to avoid configuration mismatches
+      # FIX 2: Removed '--set-env-vars=PORT=8080' entirely so Cloud Run doesn't throw an Audit Error
       - name: Deploy to Cloud Run
         run: |
          gcloud run deploy ${{ env.SERVICE_NAME }} \
@@ -93,7 +93,8 @@ jobs:
             --set-env-vars=AUTH_GITHUB_CLIENT_SECRET=${{ secrets.AUTH_GITHUB_CLIENT_SECRET }} \
             --set-env-vars=AUTH_OKTA_CLIENT_ID=${{ secrets.AUTH_OKTA_CLIENT_ID }} \
             --set-env-vars=AUTH_OKTA_CLIENT_SECRET=${{ secrets.AUTH_OKTA_CLIENT_SECRET }} \
-            --set-env-vars=AUTH_OKTA_AUDIENCE=${{ secrets.AUTH_OKTA_AUDIENCE }}
+            --set-env-vars=AUTH_OKTA_AUDIENCE=${{ secrets.AUTH_OKTA_AUDIENCE }} \
+            --set-env-vars=GIT_TOKEN=${{ secrets.GIT_TOKEN }}
       
       - name: Get Cloud Run URL
         run: |
