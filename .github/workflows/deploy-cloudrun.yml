@@ -75,7 +75,9 @@ jobs:
           EOF
       - name: Verify Environment File
         run: |
+          echo "===== env.yaml ====="
           cat env.yaml
+          echo "===================="
 
       - name: Deploy to Cloud Run
         run: |
