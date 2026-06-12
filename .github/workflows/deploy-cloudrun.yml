@@ -69,7 +69,13 @@ jobs:
 
       - name: Create Environment File
         run: |
-          echo "${{ secrets.BACKSTAGE_ENV }}" > env.yaml
+          cat <<EOF > env.yaml
+          ${{ secrets.BACKSTAGE_ENV }}
+          EOF
+
+      - name: Verify Environment File
+        run: |
+          cat env.yaml
 
       - name: Deploy to Cloud Run
         run: |

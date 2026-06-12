@@ -1,0 +1,23 @@
+NODE_ENV: production
+
+GITHUB_TOKEN: "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"
+
+BACKSTAGE_DB_PASS: "postgres123"
+
+PROJECT_ID: "backstage-demo-sairam"
+REGION: "asia-south1"
+
+APP_BASE_URL: "https://backstage-demo-sairam-yfny4ac7bq-el.a.run.app"
+
+POSTGRES_HOST: "34.100.169.89"
+POSTGRES_PORT: "5432"
+POSTGRES_USER: "postgres"
+POSTGRES_PASSWORD: "postgres123"
+POSTGRES_DATABASE: "backstage"
+
+AUTH_OKTA_AUDIENCE: "https://trial-7958725.okta.com"
+AUTH_OKTA_CLIENT_ID: "0oa13xyyfwp0dahuw698"
+AUTH_OKTA_CLIENT_SECRET: "xLceEDW6g8yHI7uDFrQCqon7a7GKhAmIrCuyxLU_KyHRFrWAX6Ve_gQgrIeVxXHo"
+
+AUTH_GITHUB_CLIENT_ID: "Ov23liqlJ8REmzDjf4nV"
+AUTH_GITHUB_CLIENT_SECRET: "3597cc63442e4643f542dd23070c1cdec74e3c62"
