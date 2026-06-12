@@ -29,19 +29,19 @@ jobs:
         with:
           node-version: 22
           cache: yarn
-
       - name: Install Dependencies
         run: yarn install --immutable
 
       - name: Compile TypeScript
         run: yarn tsc
 
+      # Step 1: Compile both frontend and backend assets across the repo
       - name: Build All Packages
         run: yarn build:all
 
-      # FIX 1: Using the precise package build command for Backstage monorepos
+      # Step 2: FIX HERE - Force the backend packager to bundle the frontend build into bundle.tar.gz
       - name: Package Backend and Frontend Bundle
-        run: yarn workspace backend backstage-cli package build
+        run: yarn workspace backend backstage-cli package build --all
 
       - name: Verify Bundle Contents
         run: |
