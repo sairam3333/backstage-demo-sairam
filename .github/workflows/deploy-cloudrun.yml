@@ -67,28 +67,27 @@ jobs:
           docker push \
             asia-south1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
-      - name: Create Environment File
-        shell: bash
-        run: |
-          cat > env.yaml << 'EOF'
-          ${{ secrets.BACKSTAGE_ENV }}
-          EOF
-      - name: Verify Environment File
-        run: |
-          echo "===== env.yaml ====="
-          cat env.yaml
-          echo "===================="
-
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy ${{ env.SERVICE_NAME }} \
+         gcloud run deploy ${{ env.SERVICE_NAME }} \
             --image=asia-south1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
             --platform=managed \
             --region=${{ env.REGION }} \
             --allow-unauthenticated \
             --memory=2Gi \
             --cpu=2 \
-            --env-vars-file=env.yaml
+            --set-env-vars=NODE_ENV=production \
+            --set-env-vars=APP_BASE_URL=${{ secrets.APP_BASE_URL }} \
+            --set-env-vars=POSTGRES_HOST=${{ secrets.POSTGRES_HOST }} \
+            --set-env-vars=POSTGRES_PORT=${{ secrets.POSTGRES_PORT }} \
+            --set-env-vars=POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
+            --set-env-vars=POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
+            --set-env-vars=POSTGRES_DATABASE=${{ secrets.POSTGRES_DATABASE }} \
+            --set-env-vars=AUTH_GITHUB_CLIENT_ID=${{ secrets.AUTH_GITHUB_CLIENT_ID }} \
+            --set-env-vars=AUTH_GITHUB_CLIENT_SECRET=${{ secrets.AUTH_GITHUB_CLIENT_SECRET }} \
+            --set-env-vars=AUTH_OKTA_CLIENT_ID=${{ secrets.AUTH_OKTA_CLIENT_ID }} \
+            --set-env-vars=AUTH_OKTA_CLIENT_SECRET=${{ secrets.AUTH_OKTA_CLIENT_SECRET }} \
+            --set-env-vars=AUTH_OKTA_AUDIENCE=${{ secrets.AUTH_OKTA_AUDIENCE }}
       
       - name: Get Cloud Run URL
         run: |
