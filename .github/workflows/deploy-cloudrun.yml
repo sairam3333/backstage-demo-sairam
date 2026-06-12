@@ -39,9 +39,9 @@ jobs:
       - name: Build All Packages
         run: yarn build:all
 
-      # FIX: Replaced 'yarn build:backend' with the native Backstage CLI production bundler
+      # FIX: Changed 'packages/backend' to the correct workspace name 'backend'
       - name: Package Backend and Frontend Bundle
-        run: yarn workspace packages/backend backstage-cli package package --bundle
+        run: yarn workspace backend backstage-cli package package --bundle
 
       - name: Verify Bundle Contents
         run: |
