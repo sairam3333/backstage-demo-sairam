@@ -41,7 +41,7 @@ jobs:
 
       # Step 2: FIX HERE - Force the backend packager to bundle the frontend build into bundle.tar.gz
       - name: Package Backend and Frontend Bundle
-        run: yarn workspace backend backstage-cli package build --all
+        run: yarn backstage-cli package build --all
 
       - name: Verify Bundle Contents
         run: |
