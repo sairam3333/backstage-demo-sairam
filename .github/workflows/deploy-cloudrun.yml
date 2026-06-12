@@ -39,7 +39,8 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build \
-            -t asia-south1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} .
+            -f packages/backend/Dockerfile \
+            -t asia-south1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/backstage-demo-sairam:${{ github.sha }} .
 
       - name: Push Docker Image
         run: |

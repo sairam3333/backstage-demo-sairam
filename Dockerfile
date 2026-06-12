@@ -8,10 +8,14 @@ RUN apt-get update && \
 
 COPY . .
 
-RUN yarn install
+RUN yarn install --frozen-lockfile
+
+RUN yarn tsc
 
 RUN yarn build:backend
 
+ENV NODE_ENV=production
+
 EXPOSE 7007
 
-CMD ["yarn", "start"]
+CMD ["node", "packages/backend", "--config", "app-config.yaml", "--config", "app-config.production.yaml"]
