@@ -1,96 +1,52 @@
 app:
-  title: Scaffolded Backstage App
-  baseUrl: http://localhost:3000
-  packages: all
-  extensions:
-    - page:catalog:
-        config:
-          path: /
-    - page:tech-radar:
-        config:
-          path: /tech-radar
+  title: Backstage
+  baseUrl: ${APP_BASE_URL}
 
 organization:
   name: My Company
 
 backend:
-  baseUrl: http://localhost:7007
+  baseUrl: ${APP_BASE_URL}
   listen:
-    port: 7007
+    port: ${PORT}
     host: 0.0.0.0
+  cors:
+    origin: ${APP_BASE_URL}
+    methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
+    credentials: true
   reading:
     allow:
       - host: raw.githubusercontent.com
       - host: github.com
-  csp:
-    connect-src: ["'self'", 'http:', 'https:']
-  cors:
-    origin: http://localhost:3000
-    methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
-    credentials: true
   database:
     client: pg
     connection:
-      host: 127.0.0.1
-      port: 9470
-      user: postgres
-      password: postgres123
-      database: backstage
+      host: ${POSTGRES_HOST}
+      port: ${POSTGRES_PORT}
+      user: ${POSTGRES_USER}
+      password: ${POSTGRES_PASSWORD}
+      database: ${POSTGRES_DATABASE}
 
 integrations:
   github:
     - host: github.com
       token: ${GIT_TOKEN}
 
-techdocs:
-  builder: local
-  generator:
-    runIn: local
-  publisher:
-    type: local
-
 auth:
-  environment: development
+  environment: production
   providers:
     github:
-      development:
-        clientId: ${AUTH_GITHUB_CLIENT_ID}
-        clientSecret: ${AUTH_GITHUB_CLIENT_SECRET}
       production:
         clientId: ${AUTH_GITHUB_CLIENT_ID}
         clientSecret: ${AUTH_GITHUB_CLIENT_SECRET}
     okta:
-      development:
-        clientId: ${AUTH_OKTA_CLIENT_ID}
-        clientSecret: ${AUTH_OKTA_CLIENT_SECRET}
-        audience: ${AUTH_OKTA_AUDIENCE}
       production:
         clientId: ${AUTH_OKTA_CLIENT_ID}
         clientSecret: ${AUTH_OKTA_CLIENT_SECRET}
         audience: ${AUTH_OKTA_AUDIENCE}
 
-scaffolder:
-  defaultAuthor:
-    name: Backstage
-    email: backstage@elitecorpusa.com
-
 catalog:
-  import:
-    entityFilename: catalog-info.yaml
-    pullRequestBranchName: backstage-integration
-  rules:
-    - allow: [Component, System, API, Resource, Location, Group, User, Template]
   locations:
-    - type: file
-      target: ../../examples/entities.yaml
-    - type: file
-      target: ../../examples/template/template.yaml
-      rules:
-        - allow: [Template]
-    - type: file
-      target: ../../examples/org.yaml
-      rules:
-        - allow: [User, Group]
     - type: url
       target: https://github.com/udhayakiran-stack/template-structure/blob/main/template.yaml
       rules:
@@ -98,7 +54,3 @@ catalog:
 
 permission:
   enabled: true
-
-mcpActions:
-  name: My Company Backstage
-  description: Tools for managing your software catalog and templates
