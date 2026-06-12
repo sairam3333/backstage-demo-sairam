@@ -47,7 +47,7 @@ jobs:
         run: |
           ls -la packages/backend/dist
           tar -tzf packages/backend/dist/bundle.tar.gz | head -100
-          
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -83,7 +83,6 @@ jobs:
             --memory=2Gi \
             --cpu=2 \
             --set-env-vars=NODE_ENV=production \
-            --set-env-vars=PORT=8080 \
             --set-env-vars=APP_BASE_URL=${{ secrets.APP_BASE_URL }} \
             --set-env-vars=POSTGRES_HOST=${{ secrets.POSTGRES_HOST }} \
             --set-env-vars=POSTGRES_PORT=${{ secrets.POSTGRES_PORT }} \
