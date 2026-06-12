@@ -26,7 +26,7 @@ backend:
   #     - secret: ${BACKEND_SECRET}
   baseUrl: http://localhost:7007
   listen:
-    port: ${PORT}
+    port: 7007
     # Uncomment the following host directive to bind to specific interfaces
     # host: 127.0.0.1
   reading:
@@ -51,8 +51,8 @@ backend:
   database:
     client: pg
     connection:
-      host: 34.100.169.89
-      port: 5432
+      host: 127.0.0.1
+      port: 9470
       user: postgres
       password: postgres123
       database: backstage

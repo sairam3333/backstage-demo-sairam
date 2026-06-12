@@ -1,4 +1,5 @@
 app:
+  title: Backstage
   baseUrl: ${APP_BASE_URL}
 
 organization:
@@ -6,10 +7,6 @@ organization:
 
 backend:
   baseUrl: ${APP_BASE_URL}
-
-  auth:
-    # keys:
-    #   - secret: ${BACKEND_SECRET}
 
   listen:
     port: ${PORT}
@@ -44,6 +41,13 @@ integrations:
     - host: github.com
       token: ${GITHUB_TOKEN}
 
+techdocs:
+  builder: local
+  generator:
+    runIn: local
+  publisher:
+    type: local
+
 auth:
   environment: production
 
@@ -52,23 +56,12 @@ auth:
       production:
         clientId: ${AUTH_GITHUB_CLIENT_ID}
         clientSecret: ${AUTH_GITHUB_CLIENT_SECRET}
-        
+
     okta:
       production:
         clientId: ${AUTH_OKTA_CLIENT_ID}
         clientSecret: ${AUTH_OKTA_CLIENT_SECRET}
         audience: ${AUTH_OKTA_AUDIENCE}
-
-techdocs:
-  builder: external
-
-  generator:
-    runIn: local
-
-  publisher:
-    type: googleGcs
-    googleGcs:
-      bucketName: ${PROJECT_ID}-techdocs
 
 scaffolder:
   defaultAuthor:
@@ -103,4 +96,4 @@ permission:
 
 mcpActions:
   name: My Company Backstage
-  description: Tools for managing your software catalog and developer portal
+  description: Tools for managing your software catalog and templates
