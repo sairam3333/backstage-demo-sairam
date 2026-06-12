@@ -92,18 +92,18 @@ jobs:
             --cpu=2 \
             --port=7007 \
             --set-env-vars="NODE_ENV=production" \
-            --set-env-vars="APP_BASE_URL=${{ secrets.APP_BASE_URL }}" \
-            --set-env-vars="POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" \
-            --set-env-vars="POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}" \
-            --set-env-vars="POSTGRES_USER=${{ secrets.POSTGRES_USER }}" \
-            --set-env-vars="POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" \
-            --set-env-vars="POSTGRES_DATABASE=${{ secrets.POSTGRES_DATABASE }}" \
-            --set-env-vars="AUTH_GITHUB_CLIENT_ID=${{ secrets.AUTH_GITHUB_CLIENT_ID }}" \
-            --set-env-vars="AUTH_GITHUB_CLIENT_SECRET=${{ secrets.AUTH_GITHUB_CLIENT_SECRET }}" \
-            --set-env-vars="AUTH_OKTA_CLIENT_ID=${{ secrets.AUTH_OKTA_CLIENT_ID }}" \
-            --set-env-vars="AUTH_OKTA_CLIENT_SECRET=${{ secrets.AUTH_OKTA_CLIENT_SECRET }}" \
-            --set-env-vars="AUTH_OKTA_AUDIENCE=${{ secrets.AUTH_OKTA_AUDIENCE }}" \
-            --set-env-vars="GIT_TOKEN=${{ secrets.GIT_TOKEN }}"
+            --set-env-vars="APP_BASE_URL=https://backstage-demo-sairam-yfny4ac7bq-el.a.run.app" \
+            --set-env-vars="POSTGRES_HOST=34.100.169.89" \
+            --set-env-vars="POSTGRES_PORT=5432" \
+            --set-env-vars="POSTGRES_USER=postgres" \
+            --set-env-vars="POSTGRES_PASSWORD=postgres123" \
+            --set-env-vars="POSTGRES_DATABASE=backstage" \
+            --set-env-vars="AUTH_GITHUB_CLIENT_ID=Ov23liqlJ8REmzDjf4nV" \
+            --set-env-vars="AUTH_GITHUB_CLIENT_SECRET=3597cc63442e4643f542dd23070c1cdec74e3c62" \
+            --set-env-vars="AUTH_OKTA_CLIENT_ID=0oa13xyyfwp0dahuw698" \
+            --set-env-vars="AUTH_OKTA_CLIENT_SECRET=xLceEDW6g8yHI7uDFrQCqon7a7GKhAmIrCuyxLU_KyHRFrWAX6Ve_gQgrIeVxXHo" \
+            --set-env-vars="AUTH_OKTA_AUDIENCE=https://trial-7958725.okta.com" \
+            --set-env-vars="GIT_TOKEN=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"
 
       - name: Get Cloud Run URL
         run: |
