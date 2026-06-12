@@ -68,11 +68,11 @@ jobs:
             asia-south1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
       - name: Create Environment File
+        shell: bash
         run: |
-          cat <<EOF > env.yaml
+          cat > env.yaml << 'EOF'
           ${{ secrets.BACKSTAGE_ENV }}
           EOF
-
       - name: Verify Environment File
         run: |
           cat env.yaml
