@@ -7,26 +7,17 @@ organization:
 
 backend:
   baseUrl: ${APP_BASE_URL}
-
   listen:
     port: ${PORT}
-
+    host: 0.0.0.0
   cors:
     origin: ${APP_BASE_URL}
-    methods:
-      - GET
-      - HEAD
-      - PATCH
-      - POST
-      - PUT
-      - DELETE
+    methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
     credentials: true
-
   reading:
     allow:
       - host: raw.githubusercontent.com
       - host: github.com
-
   database:
     client: pg
     connection:
@@ -41,59 +32,25 @@ integrations:
     - host: github.com
       token: ${GIT_TOKEN}
 
-techdocs:
-  builder: local
-  generator:
-    runIn: local
-  publisher:
-    type: local
-
 auth:
   environment: production
-
   providers:
     github:
       production:
         clientId: ${AUTH_GITHUB_CLIENT_ID}
         clientSecret: ${AUTH_GITHUB_CLIENT_SECRET}
-
     okta:
       production:
         clientId: ${AUTH_OKTA_CLIENT_ID}
         clientSecret: ${AUTH_OKTA_CLIENT_SECRET}
         audience: ${AUTH_OKTA_AUDIENCE}
 
-scaffolder:
-  defaultAuthor:
-    name: Backstage
-    email: backstage@elitecorpusa.com
-
 catalog:
-  import:
-    entityFilename: catalog-info.yaml
-    pullRequestBranchName: backstage-integration
-
-  rules:
-    - allow:
-        - Component
-        - System
-        - API
-        - Resource
-        - Location
-        - Group
-        - User
-        - Template
-
   locations:
     - type: url
       target: https://github.com/udhayakiran-stack/template-structure/blob/main/template.yaml
       rules:
-        - allow:
-            - Template
+        - allow: [Template]
 
 permission:
   enabled: true
-
-mcpActions:
-  name: My Company Backstage
-  description: Tools for managing your software catalog and templates

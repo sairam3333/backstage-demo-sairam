@@ -1,12 +1,8 @@
 app:
   title: Scaffolded Backstage App
   baseUrl: http://localhost:3000
-
-  # Enable all packages by default, this will discover packages from packages/app/package.json
   packages: all
-
   extensions:
-    # Configure the catalog index page to be the root page, this is normally mounted on /catalog
     - page:catalog:
         config:
           path: /
@@ -18,36 +14,20 @@ organization:
   name: My Company
 
 backend:
-  # Used for enabling authentication, secret is shared by all backend plugins
-  # See https://backstage.io/docs/auth/service-to-service-auth for
-  # information on the format
-  # auth:
-  #   keys:
-  #     - secret: ${BACKEND_SECRET}
   baseUrl: http://localhost:7007
   listen:
     port: 7007
-    # Uncomment the following host directive to bind to specific interfaces
-    # host: 127.0.0.1
+    host: 0.0.0.0
   reading:
     allow:
       - host: raw.githubusercontent.com
       - host: github.com
-
   csp:
     connect-src: ["'self'", 'http:', 'https:']
-    # Content-Security-Policy directives follow the Helmet format: https://helmetjs.github.io/#reference
-    # Default Helmet Content-Security-Policy values can be removed by setting the key to false
   cors:
     origin: http://localhost:3000
     methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
     credentials: true
-  # This is for local development only, it is not recommended to use this in production
-  # The production database configuration is stored in app-config.production.yaml
-  # database:
-  #   client: better-sqlite3
-  #   connection: ':memory:'
-  # see https://backstage.io/docs/ai/mcp-actions#actions-configuration for more details
   database:
     client: pg
     connection:
@@ -56,137 +36,69 @@ backend:
       user: postgres
       password: postgres123
       database: backstage
-  actions:
-    pluginSources:
-      - auth
-      - catalog
-      - scaffolder
-  # workingDirectory: /tmp # Use this to configure a working directory for the scaffolder, defaults to the OS temp-dir
 
 integrations:
   github:
     - host: github.com
-      # This is a Personal Access Token or PAT from GitHub. You can find out how to generate this token, and more information
-      # about setting up the GitHub integration here: https://backstage.io/docs/integrations/github/locations#configuration
-      # token: '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'
-      token: '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'
-    ### Example for how to add your GitHub Enterprise instance using the API:
-    # - host: ghe.example.net
-    #   apiBaseUrl: https://ghe.example.net/api/v3
-    #   token: ${GHE_TOKEN}
+      token: ${GIT_TOKEN}
 
-proxy:
-  ### Example for how to add a proxy endpoint for the frontend.
-  ### A typical reason to do this is to handle HTTPS and CORS for internal services.
-  # endpoints:
-  #   '/test':
-  #     target: 'https://example.com'
-  #     changeOrigin: true
-
-# Reference documentation http://backstage.io/docs/features/techdocs/configuration
-# Note: After experimenting with basic setup, use CI/CD to generate docs
-# and an external cloud storage when deploying TechDocs for production use-case.
-# https://backstage.io/docs/features/techdocs/how-to-guides#how-to-migrate-from-techdocs-basic-to-recommended-deployment-approach
 techdocs:
-  builder: 'local' # Alternatives - 'external'
+  builder: local
   generator:
-    runIn: local # Alternatives - 'local'
+    runIn: local
   publisher:
-    type: 'local' # Alternatives - 'googleGcs' or 'awsS3'. Read documentation for using alternatives.
+    type: local
 
 auth:
   environment: development
-  # see https://backstage.io/docs/auth/ to learn about auth providers
   providers:
     github:
       development:
-        clientId: 'Ov23liqlJ8REmzDjf4nV' 
-        clientSecret: '3597cc63442e4643f542dd23070c1cdec74e3c62'
-        # clientId: ${AUTH_GITHUB_CLIENT_ID} 
-        # clientSecret: ${AUTH_GITHUB_CLIENT_SECRET}
-  # see https://backstage.io/docs/ai/mcp-actions#client-id-metadata-documents
-  # to learn more about client id metadata documents
+        clientId: ${AUTH_GITHUB_CLIENT_ID}
+        clientSecret: ${AUTH_GITHUB_CLIENT_SECRET}
+      production:
+        clientId: ${AUTH_GITHUB_CLIENT_ID}
+        clientSecret: ${AUTH_GITHUB_CLIENT_SECRET}
     okta:
       development:
-        clientId: '0oa13xyyfwp0dahuw698'
-        clientSecret: 'xLceEDW6g8yHI7uDFrQCqon7a7GKhAmIrCuyxLU_KyHRFrWAX6Ve_gQgrIeVxXHo'
-        audience: 'https://trial-7958725.okta.com'
-        # clientId: ${AUTH_OKTA_CLIENT_ID}
-        # clientSecret: ${AUTH_OKTA_CLIENT_SECRET}
-        # audience: ${AUTH_OKTA_DOMAIN}
-        # authServerId: ${AUTH_OKTA_AUTH_SERVER_ID} # Optional
-        # idp: ${AUTH_OKTA_IDP} # Optional
-        ## uncomment to set lifespan of user session
-        # sessionDuration: { hours: 24 } # Optional: supports `ms` library format (e.g. '24h', '2 days'), ISO duration, "human duration" as used in code
-        # https://developer.okta.com/docs/reference/api/oidc/#scope-dependent-claims-not-always-returned
-        # additionalScopes: ${AUTH_OKTA_ADDITIONAL_SCOPES} # Optional
-        # signIn:
-        #   resolvers:
-        #     # See https://backstage.io/docs/auth/okta/provider#resolvers for more resolvers
-        #     - resolver: emailMatchingUserEntityAnnotation
-  experimentalClientIdMetadataDocuments:
-    enabled: false
-    # Optional: restrict which `client_id` URLs are allowed (defaults to ['*'])
-    # allowedClientIdPatterns:
-    #   - 'https://example.com/*'
-    #   - 'https://*.trusted-domain.com/*'
-    # Optional: restrict which redirect URIs are allowed (defaults to ['*'])
-    # allowedRedirectUriPatterns:
-    #   - 'http://localhost:*'
-    #   - 'https://*.example.com/*'
+        clientId: ${AUTH_OKTA_CLIENT_ID}
+        clientSecret: ${AUTH_OKTA_CLIENT_SECRET}
+        audience: ${AUTH_OKTA_AUDIENCE}
+      production:
+        clientId: ${AUTH_OKTA_CLIENT_ID}
+        clientSecret: ${AUTH_OKTA_CLIENT_SECRET}
+        audience: ${AUTH_OKTA_AUDIENCE}
 
 scaffolder:
   defaultAuthor:
     name: Backstage
     email: backstage@elitecorpusa.com
-  # see https://backstage.io/docs/features/software-templates/configuration for software template options
 
 catalog:
   import:
     entityFilename: catalog-info.yaml
     pullRequestBranchName: backstage-integration
   rules:
-      - allow: [Component, System, API, Resource, Location,Group, User, Template]
+    - allow: [Component, System, API, Resource, Location, Group, User, Template]
   locations:
-    # Local example data, file locations are relative to the backend process, typically `packages/backend`
     - type: file
       target: ../../examples/entities.yaml
-
-    # Local example template
     - type: file
       target: ../../examples/template/template.yaml
       rules:
         - allow: [Template]
-
-    # Local example organizational data
     - type: file
       target: ../../examples/org.yaml
       rules:
         - allow: [User, Group]
-
-    ## Uncomment these lines to add more example data
-    # - type: url
-    #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/all.yaml
-
     - type: url
       target: https://github.com/udhayakiran-stack/template-structure/blob/main/template.yaml
       rules:
         - allow: [Template]
-    ## Uncomment these lines to add an example org
-    # - type: url
-    #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/acme-corp.yaml
-    #   rules:
-    #     - allow: [User, Group]
 
-kubernetes:
-  # see https://backstage.io/docs/features/kubernetes/configuration for kubernetes configuration options
-
-# see https://backstage.io/docs/permissions/getting-started for more on the permission framework
 permission:
-  # setting this to `false` will disable permissions
   enabled: true
 
-# see https://backstage.io/docs/ai/mcp-actions for more details
 mcpActions:
-  name: 'My Company Backstage' # defaults to "backstage"
-  description: 'Tools for managing your software catalog, creating new services from templates, and exploring your developer portal' # optional
+  name: My Company Backstage
+  description: Tools for managing your software catalog and templates
