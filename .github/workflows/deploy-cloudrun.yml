@@ -91,7 +91,6 @@ jobs:
             --memory=2Gi \
             --cpu=2 \
             --port=7007 \
-            --set-env-vars="PORT=7007" \
             --set-env-vars="NODE_ENV=production" \
             --set-env-vars="APP_BASE_URL=${{ secrets.APP_BASE_URL }}" \
             --set-env-vars="POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" \
