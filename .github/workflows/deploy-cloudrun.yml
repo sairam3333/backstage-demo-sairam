@@ -29,24 +29,32 @@ jobs:
         with:
           node-version: 22
           cache: yarn
+
       - name: Install Dependencies
         run: yarn install --immutable
 
       - name: Compile TypeScript
         run: yarn tsc
 
-      # Step 1: Compile both frontend and backend assets across the repo
+      # Builds both frontend (app) and backend packages
       - name: Build All Packages
         run: yarn build:all
 
-      # Step 2: FIX HERE - Force the backend packager to bundle the frontend build into bundle.tar.gz
-      - name: Package Backend and Frontend Bundle
-        run: yarn backstage-cli package build --all
+      # This produces skeleton.tar.gz and bundle.tar.gz in packages/backend/dist
+      # bundle.tar.gz will include the compiled frontend from the previous step
+      - name: Package Backend
+        run: yarn workspace backend build
 
       - name: Verify Bundle Contents
         run: |
+          echo "=== dist folder contents ==="
           ls -la packages/backend/dist
+
+          echo "=== bundle.tar.gz contents (first 100 entries) ==="
           tar -tzf packages/backend/dist/bundle.tar.gz | head -100
+
+          echo "=== Checking frontend assets are present ==="
+          tar -tzf packages/backend/dist/bundle.tar.gz | grep "static/" | head -20
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -65,39 +73,51 @@ jobs:
           docker build \
             -f packages/backend/Dockerfile \
             -t asia-south1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            -t asia-south1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:latest \
             .
 
       - name: Push Docker Image
         run: |
-          docker push \
-            asia-south1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker push asia-south1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker push asia-south1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:latest
 
-      # FIX 2: Removed '--set-env-vars=PORT=8080' entirely so Cloud Run doesn't throw an Audit Error
       - name: Deploy to Cloud Run
         run: |
-         gcloud run deploy ${{ env.SERVICE_NAME }} \
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
             --image=asia-south1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
             --platform=managed \
             --region=${{ env.REGION }} \
             --allow-unauthenticated \
             --memory=2Gi \
             --cpu=2 \
-            --set-env-vars=NODE_ENV=production \
-            --set-env-vars=APP_BASE_URL=${{ secrets.APP_BASE_URL }} \
-            --set-env-vars=POSTGRES_HOST=${{ secrets.POSTGRES_HOST }} \
-            --set-env-vars=POSTGRES_PORT=${{ secrets.POSTGRES_PORT }} \
-            --set-env-vars=POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
-            --set-env-vars=POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
-            --set-env-vars=POSTGRES_DATABASE=${{ secrets.POSTGRES_DATABASE }} \
-            --set-env-vars=AUTH_GITHUB_CLIENT_ID=${{ secrets.AUTH_GITHUB_CLIENT_ID }} \
-            --set-env-vars=AUTH_GITHUB_CLIENT_SECRET=${{ secrets.AUTH_GITHUB_CLIENT_SECRET }} \
-            --set-env-vars=AUTH_OKTA_CLIENT_ID=${{ secrets.AUTH_OKTA_CLIENT_ID }} \
-            --set-env-vars=AUTH_OKTA_CLIENT_SECRET=${{ secrets.AUTH_OKTA_CLIENT_SECRET }} \
-            --set-env-vars=AUTH_OKTA_AUDIENCE=${{ secrets.AUTH_OKTA_AUDIENCE }} \
-            --set-env-vars=GIT_TOKEN=${{ secrets.GIT_TOKEN }}
-      
+            --port=7007 \
+            --set-env-vars="PORT=7007" \
+            --set-env-vars="NODE_ENV=production" \
+            --set-env-vars="APP_BASE_URL=${{ secrets.APP_BASE_URL }}" \
+            --set-env-vars="POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}" \
+            --set-env-vars="POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}" \
+            --set-env-vars="POSTGRES_USER=${{ secrets.POSTGRES_USER }}" \
+            --set-env-vars="POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" \
+            --set-env-vars="POSTGRES_DATABASE=${{ secrets.POSTGRES_DATABASE }}" \
+            --set-env-vars="AUTH_GITHUB_CLIENT_ID=${{ secrets.AUTH_GITHUB_CLIENT_ID }}" \
+            --set-env-vars="AUTH_GITHUB_CLIENT_SECRET=${{ secrets.AUTH_GITHUB_CLIENT_SECRET }}" \
+            --set-env-vars="AUTH_OKTA_CLIENT_ID=${{ secrets.AUTH_OKTA_CLIENT_ID }}" \
+            --set-env-vars="AUTH_OKTA_CLIENT_SECRET=${{ secrets.AUTH_OKTA_CLIENT_SECRET }}" \
+            --set-env-vars="AUTH_OKTA_AUDIENCE=${{ secrets.AUTH_OKTA_AUDIENCE }}" \
+            --set-env-vars="GIT_TOKEN=${{ secrets.GIT_TOKEN }}"
+
       - name: Get Cloud Run URL
         run: |
-          gcloud run services describe ${{ env.SERVICE_NAME }} \
+          SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
             --region=${{ env.REGION }} \
-            --format="value(status.url)"
+            --format="value(status.url)")
+          echo "✅ Backstage deployed at: $SERVICE_URL"
+          echo "SERVICE_URL=$SERVICE_URL" >> $GITHUB_ENV
+
+      - name: Smoke Test Deployment
+        run: |
+          echo "Testing $SERVICE_URL/healthcheck"
+          curl --fail --retry 5 --retry-delay 5 \
+            "$SERVICE_URL/healthcheck" \
+            && echo "✅ Health check passed" \
+            || echo "⚠️  Health check failed — check Cloud Run logs"
