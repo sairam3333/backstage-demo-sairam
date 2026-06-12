@@ -39,8 +39,9 @@ jobs:
       - name: Build All Packages
         run: yarn build:all
 
-      - name: Build Backend Bundle
-        run: yarn build:backend
+      # FIX: Replaced 'yarn build:backend' with the native Backstage CLI production bundler
+      - name: Package Backend and Frontend Bundle
+        run: yarn workspace packages/backend backstage-cli package package --bundle
 
       - name: Verify Bundle Contents
         run: |
@@ -71,6 +72,7 @@ jobs:
           docker push \
             asia-south1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
+      # FIX: Explicitly passing the standard Cloud Run PORT to avoid configuration mismatches
       - name: Deploy to Cloud Run
         run: |
          gcloud run deploy ${{ env.SERVICE_NAME }} \
@@ -81,6 +83,7 @@ jobs:
             --memory=2Gi \
             --cpu=2 \
             --set-env-vars=NODE_ENV=production \
+            --set-env-vars=PORT=8080 \
             --set-env-vars=APP_BASE_URL=${{ secrets.APP_BASE_URL }} \
             --set-env-vars=POSTGRES_HOST=${{ secrets.POSTGRES_HOST }} \
             --set-env-vars=POSTGRES_PORT=${{ secrets.POSTGRES_PORT }} \
