@@ -24,6 +24,25 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install Dependencies
+        run: yarn install --immutable
+
+      - name: Compile TypeScript
+        run: yarn tsc
+
+      - name: Build Backend Bundle
+        run: yarn build:backend
+
+      - name: Verify Backend Bundle
+        run: |
+          ls -la packages/backend/dist
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -40,7 +59,8 @@ jobs:
         run: |
           docker build \
             -f packages/backend/Dockerfile \
-            -t asia-south1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/backstage-demo-sairam:${{ github.sha }} .
+            -t asia-south1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            .
 
       - name: Push Docker Image
         run: |
@@ -54,7 +74,6 @@ jobs:
             --platform=managed \
             --region=${{ env.REGION }} \
             --allow-unauthenticated \
-            --port=7007 \
             --memory=2Gi \
             --cpu=2 \
             --set-env-vars=NODE_ENV=production \
@@ -75,4 +94,4 @@ jobs:
         run: |
           gcloud run services describe ${{ env.SERVICE_NAME }} \
             --region=${{ env.REGION }} \
-            --format='value(status.url)'
+            --format="value(status.url)"
